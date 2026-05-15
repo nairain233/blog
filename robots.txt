@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /_astro/
 
-Sitemap: https://blog.nairain.com/sitemap-index.xml
+Sitemap: https://blog.nairain.xyz/sitemap-index.xml
