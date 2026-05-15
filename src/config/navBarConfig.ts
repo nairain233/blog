@@ -64,13 +64,13 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 			LinkPreset.About,
 			{
 				name: "网站状态",
-				url: "https://status.nairain.com/",
+				url: "https://status.nairain.xyz/",
 				external: true,
 				icon: "material-symbols:ecg-heart",
 			},
 			{
 				name: "探针监测",
-				url: "https://vps.nairain.com/",
+				url: "https://vps.nairain.xyz/",
 				external: true,
 				icon: "material-symbols:computer",
 			},

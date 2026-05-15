@@ -13,7 +13,7 @@ export const siteConfig: SiteConfig = {
 	subtitle: "华风夏韵",
 
 	// 站点 URL
-	site_url: "https://blog.nairain.com/",
+	site_url: "https://blog.nairain.xyz/",
 
 	// 站点描述
 	description: "我的博客，用来写一些文章和感悟之类的东西。",
@@ -184,7 +184,7 @@ export const siteConfig: SiteConfig = {
 			// Umami Website ID
 			websiteId: "61cf25da-3c0e-4f4a-8451-e615994102fc",
 			// Umami JS地址，支持使用自建
-			scriptUrl: "https://u.nairain.com/script.js",
+			scriptUrl: "https://u.nairain.xyz/script.js",
 			// 是否追踪出站链接
 			trackOutboundLinks: true,
 			// 是否收集浏览器性能指标
