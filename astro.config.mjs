@@ -45,7 +45,7 @@ if (process.env.NODE_ENV === "development") {
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
-	
+
 	base: "/",
 	trailingSlash: "always",
 
@@ -248,6 +248,7 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		assetsInclude: ["**/*.jsonl"],
 		server: {
 			watch: {
 				ignored: ["**/package/**", "**/Firefly-docs/**"],

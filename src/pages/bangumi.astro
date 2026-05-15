@@ -27,11 +27,11 @@ const bangumiConfig = {
 	username: siteConfig.bangumi?.userId, // 在这里配置你的Bangumi用户名
 	apiUrl: "https://api.bgm.tv",
 	categories: {
-		book: true,
-		anime: true,
-		music: true,
+		book: false, // 不启用书籍分类
+		anime: true, // 启用动画分类
+		music: false, // 不启用音乐分类
 		game: true,
-		real: false,
+		real: false, // 不启用三次元
 	},
 	// 数据获取设置
 	pagination: {

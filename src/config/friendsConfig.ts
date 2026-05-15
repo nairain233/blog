@@ -29,8 +29,35 @@ export const friendsConfig: FriendLink[] = [
 		desc: "飞萤之火自无梦的长夜亮起，绽放在终竟的明天。",
 		siteurl: "https://blog.cuteleaf.cn",
 		tags: ["Blog"],
-		weight: 10, // 权重，数字越大排序越靠前
+		weight: 9, // 权重，数字越大排序越靠前
 		enabled: true, // 是否启用
+	},
+	{
+		title: "AcoFork Blog",
+		imgurl: "https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0",
+		desc: "Protect What You Love.",
+		siteurl: "https://2x.nz",
+		tags: ["Blog"],
+		weight: 9,
+		enabled: true,
+	},
+	{
+		title: "kiyukie'Blog",
+		imgurl: "https://cdn.nodeimage.com/i/Q6NDWWd1h3I18zBNTwxFJABm5iKuGkuW.webp",
+		desc: "剑气纵横三万里，一剑光寒十九洲。",
+		siteurl: "https://blog.030666.xyz",
+		tags: ["Blog"],
+		weight: 9,
+		enabled: true,
+	},
+	{
+		title: "NNNullptr南",
+		imgurl: "https://www.xnmoe.com/assets/images/pfp.png",
+		desc: "数学生的古早风格个人站",
+		siteurl: "https://xnmoe.com",
+		tags: ["Blog"],
+		weight: 9,
+		enabled: true,
 	},
 	{
 		title: "Firefly Docs",
@@ -38,17 +65,8 @@ export const friendsConfig: FriendLink[] = [
 		desc: "Firefly主题模板文档",
 		siteurl: "https://docs-firefly.cuteleaf.cn",
 		tags: ["Docs"],
-		weight: 9,
-		enabled: true,
-	},
-	{
-		title: "Astro",
-		imgurl: "https://avatars.githubusercontent.com/u/44914786?v=4&s=640",
-		desc: "The web framework for content-driven websites. ⭐️ Star to support our work!",
-		siteurl: "https://github.com/withastro/astro",
-		tags: ["Framework"],
 		weight: 8,
-		enabled: true,
+		enabled: false,
 	},
 ];
 

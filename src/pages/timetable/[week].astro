@@ -1,0 +1,474 @@
+---
+import { Icon } from "astro-icon/components";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import {
+	convertColorHex,
+	getCoursesForWeek,
+	getCurrentWeek,
+	parseTimetableData,
+} from "@/utils/timetable-utils";
+
+export function getStaticPaths() {
+	const timetableData = parseTimetableData();
+	return Array.from({ length: timetableData.config.maxWeek }, (_, i) => ({
+		params: { week: String(i + 1) },
+	}));
+}
+
+const data = parseTimetableData();
+let currentWeek = getCurrentWeek(data.config.startDate, new Date());
+
+const weekParam = Astro.params.week;
+if (weekParam) {
+	const weekNum = Number.parseInt(weekParam, 10);
+	if (
+		!Number.isNaN(weekNum) &&
+		weekNum >= 1 &&
+		weekNum <= data.config.maxWeek
+	) {
+		currentWeek = weekNum;
+	}
+}
+
+const prevWeek = Math.max(1, currentWeek - 1);
+const nextWeek = Math.min(data.config.maxWeek, currentWeek + 1);
+
+// 获取该周所有课程
+const weekCourses = getCoursesForWeek(data, currentWeek);
+
+const dayNames = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+const timeGroups = [
+	{ label: "第1节", startNode: 1, endNode: 2 },
+	{ label: "第2节", startNode: 3, endNode: 4 },
+	{ label: "第3节", startNode: 5, endNode: 6 },
+	{ label: "第4节", startNode: 7, endNode: 8 },
+	{ label: "第5节", startNode: 9, endNode: 11 },
+];
+
+const dayCount = data.config.showSun ? 7 : data.config.showSat ? 6 : 5;
+
+// 过滤出有效的时间节点
+const validTimeNodes = data.timeNodes.filter(
+	(n) => n.node <= data.config.nodes,
+);
+
+// 客户端数据
+const clientData = {
+	startDate: data.config.startDate,
+	currentWeek,
+	maxWeek: data.config.maxWeek,
+	nodes: data.config.nodes,
+	courses: data.courses.map((c) => ({
+		id: c.id,
+		courseName: c.courseName,
+		color: convertColorHex(c.color),
+		credit: c.credit,
+	})),
+	schedules: data.schedules.map((s) => ({
+		day: s.day,
+		id: s.id,
+		startNode: s.startNode,
+		step: s.step,
+		startWeek: s.startWeek,
+		endWeek: s.endWeek,
+		room: s.room,
+		teacher: s.teacher,
+		type: s.type,
+	})),
+	timeNodes: validTimeNodes,
+};
+
+function getDayOfWeekText(
+	day: number,
+	week: number,
+	startDate: string,
+): string {
+	const parts = startDate.split("-");
+	if (parts.length !== 3) return "";
+
+	const start = new Date(
+		Number.parseInt(parts[0], 10),
+		Number.parseInt(parts[1], 10) - 1,
+		Number.parseInt(parts[2], 10),
+	);
+	start.setHours(0, 0, 0, 0);
+
+	const targetDate = new Date(start);
+	targetDate.setDate(start.getDate() + (week - 1) * 7 + (day - 1));
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const diffDays = Math.round(
+		(targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+	);
+	if (diffDays === 0) return "今天";
+	if (diffDays === 1) return "明天";
+	if (diffDays === -1) return "昨天";
+	return "";
+}
+---
+
+<MainGridLayout>
+	<div class="card-base pb-8">
+		<div class="px-6 pt-6 pb-4">
+			<h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-1">
+				{data.config.tableName} · 课程表
+			</h1>
+			<p class="text-neutral-500 dark:text-neutral-400 text-sm">
+				开学日期：{data.config.startDate}
+			</p>
+		</div>
+
+		{/* 周次导航 */}
+		<div class="px-6 pb-4">
+			<div class="flex items-center justify-between bg-neutral-50 dark:bg-neutral-800/50 rounded-lg p-3">
+				<a
+					href={`/timetable/${prevWeek}/`}
+					class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+						prevWeek === currentWeek
+							? "text-neutral-300 dark:text-neutral-600 cursor-not-allowed"
+							: "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+					}`}
+					data-swup-preload
+				>
+					<div class="flex items-center gap-1">
+						<Icon name="material-symbols:chevron-left" />
+						第{prevWeek}周
+					</div>
+				</a>
+
+				<div class="text-center">
+					<div class="text-lg font-bold text-(--primary)">
+						第{currentWeek}周
+					</div>
+					<div class="text-xs text-neutral-500 dark:text-neutral-400">
+						共{data.config.maxWeek}周
+					</div>
+				</div>
+
+				<a
+					href={`/timetable/${nextWeek}/`}
+					class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+						nextWeek === currentWeek
+							? "text-neutral-300 dark:text-neutral-600 cursor-not-allowed"
+							: "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+					}`}
+					data-swup-preload
+				>
+					<div class="flex items-center gap-1">
+						第{nextWeek}周
+						<Icon name="material-symbols:chevron-right" />
+					</div>
+				</a>
+			</div>
+		</div>
+
+		{/* 课程表网格 */}
+		<div class="px-6">
+			<div class="overflow-x-auto" data-timetable-full={JSON.stringify(clientData)}>
+				<div class="min-w-[800px]">
+				{/* 表头 - 星期 */}
+				<div class="grid grid-cols-[3rem_1fr] gap-2 mb-1">
+					<div />
+					<div class="grid grid-cols-7 gap-1">
+						{dayNames.slice(1, dayCount + 1).map((day, idx) => (
+							<div class="text-center py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+								<div class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+									{day}
+								</div>
+								<div class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
+									<span class="day-of-week-text" data-day={idx + 1}>{getDayOfWeekText(idx + 1, currentWeek, data.config.startDate)}</span>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* 时间段和课程 */}
+				<div class="grid grid-cols-[3rem_1fr] gap-2">
+					{/* 时间列 */}
+					<div class="grid grid-rows-5 gap-1">
+						{timeGroups.map((group) => {
+							const startTime = validTimeNodes.find((n) => n.node === group.startNode)?.startTime;
+							const endTime = validTimeNodes.find((n) => n.node === group.endNode)?.endTime;
+							return (
+								<div class="text-center py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex flex-col justify-center">
+									<div class="text-sm font-bold text-neutral-700 dark:text-neutral-300">
+										{group.label}
+									</div>
+									<div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+										{startTime}
+									</div>
+									<div class="text-xs text-neutral-400 dark:text-neutral-500">
+										{endTime}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+
+					{/* 课程网格 */}
+					<div class="grid grid-cols-7 grid-rows-5 gap-1">
+						{weekCourses.flat().map((course) => {
+							const groupIndex = timeGroups.findIndex((g) => g.startNode === course.startNode);
+							if (groupIndex === -1) return null;
+
+							return (
+								<div
+									class="rounded-lg overflow-hidden h-full"
+									style={`grid-column: ${course.day}; grid-row: ${groupIndex + 1};`}
+								>
+									<div
+										class="h-full p-2 transition-transform hover:scale-[1.02]"
+										style={`background-color: ${course.color}20; border-left: 3px solid ${course.color};`}
+									>
+										<div class="font-medium text-sm text-neutral-800 dark:text-neutral-200 mb-1">
+											{course.courseName}
+										</div>
+										{course.room && (
+											<div class="text-xs text-neutral-600 dark:text-neutral-400 mb-0.5">
+												@{course.room}
+											</div>
+										)}
+										{course.teacher && (
+											<div class="text-xs text-neutral-500 dark:text-neutral-500">
+												{course.teacher}
+											</div>
+										)}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{/* 当前时间指示器 */}
+		<div class="px-6 pt-4">
+			<div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+				<span class="flex items-center gap-1" data-status-in-class>
+					<span class="relative flex h-2 w-2">
+						<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+						<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+					</span>
+					正在上课
+				</span>
+				<span class="flex items-center gap-1 hidden" data-status-idle>
+					<Icon name="material-symbols:circle" class="text-[0.5rem]" />
+					下课时间
+				</span>
+			</div>
+		</div>
+	</div>
+</MainGridLayout>
+
+<script is:inline define:vars={{ clientData }}>
+	// 更新星期几文本（今天/明天/昨天）
+	function updateDayOfWeekText() {
+		const dayTextElements = document.querySelectorAll(".day-of-week-text");
+		const data = clientData;
+		const parts = data.startDate.split("-");
+		if (parts.length !== 3) return;
+
+		const start = new Date(
+			parseInt(parts[0], 10),
+			parseInt(parts[1], 10) - 1,
+			parseInt(parts[2], 10),
+		);
+		start.setHours(0, 0, 0, 0);
+
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		dayTextElements.forEach((el) => {
+			const day = parseInt(el.getAttribute("data-day") || "0");
+			if (day < 1 || day > 7) {
+				el.textContent = "";
+				return;
+			}
+
+			const targetDate = new Date(start);
+			targetDate.setDate(start.getDate() + (data.currentWeek - 1) * 7 + (day - 1));
+			const diff = Math.round((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+			let text = "";
+			if (diff === 0) text = "今天";
+			else if (diff === 1) text = "明天";
+			else if (diff === -1) text = "昨天";
+			el.textContent = text;
+		});
+	}
+
+	setTimeout(updateDayOfWeekText, 0);
+	document.addEventListener("swup:contentReplaced", () => {
+		setTimeout(updateDayOfWeekText, 100);
+	});
+	// 客户端实时更新当前课程高亮
+	function updateTimetableHighlight() {
+		const timetableContainers = document.querySelectorAll("[data-timetable-full]");
+		if (timetableContainers.length === 0) return;
+
+		const inClassEl = document.querySelector("[data-status-in-class]");
+		const idleEl = document.querySelector("[data-status-idle]");
+
+		const now = new Date();
+		const data = clientData;
+
+		// 计算当前周
+		const parts = data.startDate.split("-");
+		const start = new Date(
+			parseInt(parts[0]),
+			parseInt(parts[1]) - 1,
+			parseInt(parts[2]),
+		);
+		start.setHours(0, 0, 0, 0);
+		const diffMs = now.getTime() - start.getTime();
+		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+		const week = Math.floor(diffDays / 7) + 1;
+
+		// 当前星期几
+		const jsDay = now.getDay();
+		const day = jsDay === 0 ? 7 : jsDay;
+
+		const hours = now.getHours();
+		const minutes = now.getMinutes();
+		const currentTimeStr =
+			hours.toString().padStart(2, "0") +
+			":" +
+			minutes.toString().padStart(2, "0");
+
+		let hasCurrentCourse = false;
+
+		timetableContainers.forEach((container) => {
+			// 检查是否在当前周
+			const weekText = container.parentElement?.querySelector('[class*="text-(--primary)"]')?.textContent;
+			const currentWeekMatch = weekText?.match(/第(\d+)周/);
+			if (currentWeekMatch) {
+				const pageWeek = parseInt(currentWeekMatch[1]);
+				if (pageWeek !== week) return;
+			}
+
+			// 清除所有高亮
+			container
+				.querySelectorAll(".timetable-highlight")
+				.forEach((el) => el.classList.remove("timetable-highlight"));
+
+			// 高亮当前正在上的课
+			const dayCells = container.querySelectorAll(`[data-day="${day}"]`);
+			dayCells.forEach((cell) => {
+				const startNode = cell.getAttribute("data-start-node");
+				if (!startNode) return;
+
+				const courseData = data.schedules.find((s) => {
+					if (s.day !== day) return false;
+					if (week < s.startWeek || week > s.endWeek) return false;
+					if (s.type === 1 && week % 2 === 0) return false;
+					if (s.type === 2 && week % 2 === 1) return false;
+					return s.startNode === parseInt(startNode);
+				});
+
+				if (courseData) {
+					const timeNode = data.timeNodes.find(
+						(n) => n.node === courseData.startNode,
+					);
+					const endTimeNode = data.timeNodes.find(
+						(n) => n.node === courseData.startNode + courseData.step - 1,
+					);
+
+					if (
+						timeNode &&
+						endTimeNode &&
+						currentTimeStr >= timeNode.startTime &&
+						currentTimeStr < endTimeNode.endTime
+					) {
+						const courseElement = cell.querySelector("div");
+						if (courseElement) {
+							hasCurrentCourse = true;
+							courseElement.classList.add("timetable-highlight");
+							courseElement.style.boxShadow = "0 0 0 2px rgba(16, 185, 129, 0.5), 0 0 12px rgba(16, 185, 129, 0.3)";
+						}
+					}
+				}
+			});
+		});
+
+		if (inClassEl && idleEl) {
+			inClassEl.classList.toggle("hidden", !hasCurrentCourse);
+			idleEl.classList.toggle("hidden", hasCurrentCourse);
+		}
+	}
+
+	// 每分钟更新
+	setInterval(updateTimetableHighlight, 60000);
+
+	// 页面切换时更新
+	document.addEventListener("swup:contentReplaced", () => {
+		setTimeout(updateDayOfWeekText, 100);
+		setTimeout(updateTimetableHighlight, 200);
+	});
+
+	// 初始化
+	updateDayOfWeekText();
+	setTimeout(updateTimetableHighlight, 500);
+
+	// 课程表拖动
+	const slider = document.querySelector("[data-timetable-full]");
+	let isDown = false;
+	let startX;
+	let scrollLeft;
+
+	if (slider) {
+		slider.addEventListener("mousedown", (e) => {
+			isDown = true;
+			slider.classList.add("active");
+			startX = e.pageX - slider.offsetLeft;
+			scrollLeft = slider.scrollLeft;
+		});
+		slider.addEventListener("mouseleave", () => {
+			isDown = false;
+			slider.classList.remove("active");
+		});
+		slider.addEventListener("mouseup", () => {
+			isDown = false;
+			slider.classList.remove("active");
+		});
+		slider.addEventListener("mousemove", (e) => {
+			if (!isDown) return;
+			e.preventDefault();
+			const x = e.pageX - slider.offsetLeft;
+			const walk = (x - startX) * 2; //scroll-fast
+			slider.scrollLeft = scrollLeft - walk;
+		});
+	}
+</script>
+
+<style>
+	.timetable-highlight {
+		animation: pulse-highlight 2s infinite;
+	}
+
+	[data-timetable-full].active {
+		cursor: grabbing;
+		cursor: -webkit-grabbing;
+	}
+
+	@keyframes pulse-highlight {
+		0%, 100% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.02);
+		}
+	}
+
+	[data-timetable-full]::-webkit-scrollbar {
+		display: none;
+	}
+
+	[data-timetable-full] {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
+</style>

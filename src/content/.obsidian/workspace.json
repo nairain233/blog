@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "83ec4d413ab09322",
+    "type": "split",
+    "children": [
+      {
+        "id": "7bc3fc7665cf1099",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ef0df4fe6b033300",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "posts/VPNHotspot.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "VPNHotspot"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "345c8417c5fab374",
+    "type": "split",
+    "children": [
+      {
+        "id": "7d394dd146c2ba03",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9fd7ae32436f1d9a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "byCreatedTimeReverse",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "81d2f3480c43f819",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "9a89f1689e4e53e4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 298.49999618530273
+  },
+  "right": {
+    "id": "e6fc5708692225e1",
+    "type": "split",
+    "children": [
+      {
+        "id": "a2142c0e25ff60e8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ec105c7af778e1af",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "反向链接"
+            }
+          },
+          {
+            "id": "e655c774bcc018db",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "出链"
+            }
+          },
+          {
+            "id": "ff11ad11c7c57d29",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "d7ce395254e2cfc9",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "2099f8ea75c267d7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "ef0df4fe6b033300",
+  "lastOpenFiles": [
+    "posts/images/VPNHotspot-cover.png",
+    "posts/images/VPNHotspot-2.jpg",
+    "posts/images/VPNHotspot-1.jpg",
+    "posts/VPNHotspot.md",
+    "posts/code-examples.md",
+    "posts/markdown-tutorial.md",
+    "posts/markdown-mermaid.md",
+    "posts/markdown-plantuml.md",
+    "posts/markdown-extended.md",
+    "posts/images/4446db7eee2d37e6bd9f2b3fca2a69e5.jpg",
+    "posts/ai-agent.md",
+    "posts/Downgrade-graphics-driver.md",
+    "posts/bitwarden.md",
+    "posts/galgame.md",
+    "posts/firefly-layout-system.md",
+    "posts/2026.md",
+    "posts/katex-math-example.md",
+    "posts/encrypted-demo.md",
+    "posts/images/ai-agent-2.png",
+    "posts/images/ai-agent-1.png",
+    "posts/images/ai-agent.png",
+    "posts/images/easy-cover.png",
+    "posts/images/bitwarden.png",
+    "posts/images/2026-1.png",
+    "posts/images/2026-{increment}.webp",
+    "posts/Narcissus.md",
+    "posts/The-Rainbow-Appears-After-Flowering-Rain.md",
+    "posts/firefly.md",
+    "posts/video.md",
+    "posts/seo-301.md",
+    "posts/bulid-your-blog.md",
+    "posts/draft.md",
+    "posts/code.md",
+    "posts/2025-end.md",
+    "posts/contextmenu-management.md",
+    "posts/my-first-blog.md",
+    "posts/bitwarden",
+    "posts/Downgrade-graphics-driver",
+    "未命名.canvas"
+  ]
+}

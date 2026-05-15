@@ -7,37 +7,38 @@ const SITE_LANG = "zh_CN";
 
 export const siteConfig: SiteConfig = {
 	// 站点标题
-	title: "Firefly",
+	title: "NaiRain Blog",
 
 	// 站点副标题
-	subtitle: "Demo site",
+	subtitle: "华风夏韵",
 
 	// 站点 URL
-	site_url: "https://firefly.cuteleaf.cn",
+	site_url: "https://blog.nairain.com/",
 
 	// 站点描述
-	description:
-		"Firefly 是一款基于 Astro 框架和 Fuwari 模板开发的清新美观且现代化个人博客主题模板，专为技术爱好者和内容创作者设计。该主题融合了现代 Web 技术栈，提供了丰富的功能模块和高度可定制的界面，让您能够轻松打造出专业且美观的个人博客网站。",
+	description: "我的博客，用来写一些文章和感悟之类的东西。",
 
 	// 站点关键词
 	keywords: [
+		"夜雨",
+		"nairain",
 		"Firefly",
 		"Fuwari",
 		"Astro",
 		"ACGN",
+		"blog",
 		"博客",
 		"技术博客",
 		"静态博客",
 	],
-
 	// 主题色
 	themeColor: {
 		// 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345
-		hue: 165,
+		hue: 160,
 		// 是否对访问者隐藏主题色选择器
 		fixed: false,
 		// 默认模式："light" 亮色，"dark" 暗色，"system" 跟随系统
-		defaultMode: "system",
+		defaultMode: "light",
 	},
 
 	// 页面整体宽度（单位：rem）
@@ -57,7 +58,7 @@ export const siteConfig: SiteConfig = {
 	favicon: [
 		{
 			// 图标文件路径
-			src: "/favicon/favicon.ico",
+			src: "/favicon/favicon.png",
 			// 可选，指定主题 'light' | 'dark'
 			// theme: "light",
 			// 可选，图标大小
@@ -75,11 +76,11 @@ export const siteConfig: SiteConfig = {
 		// 4. 网络图片: { type: "url", value: "https://example.com/logo.png", alt: "Logo" }
 		logo: {
 			type: "image",
-			value: "assets/images/firefly.png",
+			value: "assets/images/favicon.png",
 			alt: "🍀",
 		},
 		// 导航栏标题
-		title: "Firefly",
+		title: "洛水天依",
 		// 全宽导航栏，导航栏是否占满屏幕宽度
 		widthFull: false,
 		// 导航菜单对齐方式，left：左对齐，center：居中
@@ -91,7 +92,7 @@ export const siteConfig: SiteConfig = {
 	},
 
 	// 站点开始日期，用于统计运行天数
-	siteStartDate: "2025-01-01",
+	siteStartDate: "2025-12-03",
 
 	// 站点时区（IANA 时区字符串），用于格式化bangumi、rss里的构建日期时间等等..
 	// 示例："Asia/Shanghai", "UTC", 如果为空，则按照构建服务器的时区进行时区转换
@@ -100,7 +101,7 @@ export const siteConfig: SiteConfig = {
 	// 提醒框（Admonitions）配置，修改后需要重启开发服务器才能生效
 	// 主题：'github' | 'obsidian' | 'vitepress'，每个主题风格和语法不同，可根据喜好选择
 	rehypeCallouts: {
-		theme: "github",
+		theme: "obsidian",
 	},
 
 	// 文章页底部的"上次编辑时间"卡片开关
@@ -118,11 +119,11 @@ export const siteConfig: SiteConfig = {
 	// bangumi配置
 	bangumi: {
 		// Bangumi用户ID
-		userId: "1143164",
+		userId: "1183888",
 		// 条目类型排序，数组中的类型将按顺序优先展示
 		// 可选值: "anime" | "book" | "music" | "game" | "real" (暂不支持"real"类型)
 		// 未列出的类型将按默认顺序排在后面
-		categoryOrder: ["anime", "book", "music", "game"],
+		categoryOrder: ["game", "anime"],
 	},
 
 	// 页面开关配置 - 控制特定页面的访问权限，设为false会返回404
@@ -133,11 +134,13 @@ export const siteConfig: SiteConfig = {
 		// 赞助页面开关
 		sponsor: true,
 		// 留言板页面开关，需要配置评论系统
-		guestbook: true,
+		guestbook: false,
 		// 番组计划页面开关，含追番、游戏、书籍和音乐，dev调试时只获取一页数据，build才会获取全部数据
 		bangumi: true,
 		// 相册页面开关
 		gallery: true,
+		// 动态页面开关
+		memos: true,
 	},
 
 	// 分类导航栏开关，在首页和归档页顶部显示分类快捷导航
@@ -167,21 +170,21 @@ export const siteConfig: SiteConfig = {
 	// 分页配置
 	pagination: {
 		// 每页显示的文章数量
-		postsPerPage: 10,
+		postsPerPage: 6,
 	},
 
 	// 统计分析
 	analytics: {
 		// Google Analytics ID
-		googleAnalyticsId: "",
+		googleAnalyticsId: "G-VMTTSXZR2Z",
 		// Microsoft Clarity ID
 		microsoftClarityId: "",
 		// Umami 统计配置
 		umamiAnalytics: {
 			// Umami Website ID
-			websiteId: "",
+			websiteId: "61cf25da-3c0e-4f4a-8451-e615994102fc",
 			// Umami JS地址，支持使用自建
-			scriptUrl: "https://cloud.umami.is/script.js",
+			scriptUrl: "https://u.nairain.com/script.js",
 			// 是否追踪出站链接
 			trackOutboundLinks: true,
 			// 是否收集浏览器性能指标

@@ -86,6 +86,7 @@ export type SiteConfig = {
 		guestbook: boolean; // 留言板页面开关
 		bangumi: boolean;
 		gallery: boolean; // 相册页面开关
+		memos: boolean; // 动态页面开关
 	};
 
 	// 分类导航栏开关
@@ -409,7 +410,8 @@ export type WidgetComponentType =
 	| "advertisement"
 	| "stats"
 	| "calendar"
-	| "music";
+	| "music"
+	| "timetable";
 
 export type WidgetComponentConfig = {
 	type: WidgetComponentType; // 组件类型

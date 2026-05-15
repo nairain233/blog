@@ -9,7 +9,7 @@ export const sponsorConfig: SponsorConfig = {
 
 	// 赞助用途说明
 	usage:
-		"您的赞助将用于服务器维护、内容创作和功能开发，帮助我持续提供优质内容。",
+	    "您的赞助将用于服务器维护、内容创作和功能开发，帮助我持续提供优质内容。",
 
 	// 是否显示赞助者列表
 	showSponsorsList: true,
@@ -18,7 +18,7 @@ export const sponsorConfig: SponsorConfig = {
 	showComment: true,
 
 	// 是否在文章详情页底部显示赞助按钮
-	showButtonInPost: true,
+	showButtonInPost: false,
 
 	// 赞助方式列表
 	methods: [
@@ -29,7 +29,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/alipay.png",
 			link: "",
 			description: "使用 支付宝 扫码赞助",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "微信",
@@ -37,7 +37,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/wechat.png",
 			link: "",
 			description: "使用 微信 扫码赞助",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "ko-fi",
@@ -45,7 +45,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "",
 			link: "https://ko-fi.com/cuteleaf",
 			description: "Buy a Coffee for Firefly",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "爱发电",
@@ -53,6 +53,14 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "",
 			link: "https://ifdian.net/a/cuteleaf",
 			description: "通过 爱发电 进行赞助",
+			enabled: false,
+		},
+		{
+			name: "Github",
+			icon: "fa7-brands:github",
+			qrCode: "",
+			link: "https://github.com/nairain233/My-Blog",
+			description: "点个Star就是最大的支持",
 			enabled: true,
 		},
 	],
@@ -61,16 +69,21 @@ export const sponsorConfig: SponsorConfig = {
 	sponsors: [
 		// 示例：已实名赞助者
 		{
-			name: "夏叶",
-			amount: "¥50",
-			date: "2025-10-01",
+			name: "天依",
+			amount: "¥52",
+			date: "2025-07-12",
+		},
+		{
+			name: "Hanstune Miku",
+			amount: "¥39",
+			date: "2025-08-31",
 		},
 
 		// 示例：匿名赞助者
 		{
 			name: "匿名用户",
-			amount: "¥20",
-			date: "2025-10-01",
+			amount: "观看量*n",
+			date: "2025-08-31",
 		},
 	],
 };

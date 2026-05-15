@@ -1,0 +1,393 @@
+---
+import { Icon } from "astro-icon/components";
+import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import { convertColorHex, parseTimetableData } from "@/utils/timetable-utils";
+
+interface Props {
+	class?: string;
+	style?: string;
+}
+
+const { class: className, style } = Astro.props;
+
+// 解析课程表数据
+const data = parseTimetableData();
+
+// 将课程表数据序列化传递给客户端
+const validTimeNodes = data.timeNodes
+	.filter((n) => n.node <= data.config.nodes)
+	.map((n) => ({
+		node: n.node,
+		startTime: n.startTime,
+		endTime: n.endTime,
+	}));
+
+const clientData = {
+	startDate: data.config.startDate,
+	maxWeek: data.config.maxWeek,
+	nodes: data.config.nodes,
+	courses: data.courses.map((c) => ({
+		id: c.id,
+		courseName: c.courseName,
+		color: convertColorHex(c.color),
+		credit: c.credit,
+	})),
+	schedules: data.schedules.map((s) => ({
+		day: s.day,
+		id: s.id,
+		startNode: s.startNode,
+		step: s.step,
+		startWeek: s.startWeek,
+		endWeek: s.endWeek,
+		room: s.room,
+		teacher: s.teacher,
+		type: s.type,
+	})),
+	timeNodes: validTimeNodes,
+};
+---
+
+<WidgetLayout name="课程表" id="timetable-widget" class={className} style={style}>
+	<Icon name="material-symbols:school-outline" slot="title-icon" class="text-[1.25rem] text-(--primary) mr-3" />
+
+	<timetable-widget
+		class="block"
+		data-timetable={JSON.stringify(clientData)}
+	>
+		<div class="px-2">
+			{/* 头部信息：周次和星期 */}
+			<div class="flex items-center justify-between mb-3">
+				<span class="text-sm text-neutral-500 dark:text-neutral-400" data-timetable-week>
+					正在同步课表时间...
+				</span>
+				<a
+					href="/timetable/"
+					class="text-sm text-(--primary) hover:underline flex items-center gap-1"
+					data-swup-preload
+				>
+					完整课表
+					<Icon name="material-symbols:chevron-right" class="text-base" />
+				</a>
+			</div>
+
+			{/* 当前课程状态 */}
+			<div data-timetable-status>
+				<div class="text-center py-3">
+					<div class="text-sm text-neutral-500 dark:text-neutral-400">正在同步课程状态...</div>
+				</div>
+			</div>
+
+			{/* 今日课程列表（客户端实时生成，避免静态构建时间造成首屏错位） */}
+			<div class="mt-3 pt-3 border-t border-neutral-200/50 dark:border-neutral-700/50 hidden" data-timetable-today></div>
+		</div>
+	</timetable-widget>
+</WidgetLayout>
+
+<script is:inline define:vars={{ clientData }}>
+	const CHINA_TZ_OFFSET_MS = 8 * 60 * 60 * 1000;
+
+	function getChinaDateParts(date) {
+		const chinaDate = new Date(date.getTime() + CHINA_TZ_OFFSET_MS);
+		return {
+			year: chinaDate.getUTCFullYear(),
+			month: chinaDate.getUTCMonth(),
+			dayOfMonth: chinaDate.getUTCDate(),
+			day: chinaDate.getUTCDay(),
+			hours: chinaDate.getUTCHours(),
+			minutes: chinaDate.getUTCMinutes(),
+		};
+	}
+
+	function escapeHtml(str) {
+		return String(str)
+			.replaceAll("&", "&amp;")
+			.replaceAll("<", "&lt;")
+			.replaceAll(">", "&gt;")
+			.replaceAll('"', "&quot;")
+			.replaceAll("'", "&#39;");
+	}
+
+	// 客户端实时更新当前课程状态
+	function updateTimetableWidget() {
+		const widgets = document.querySelectorAll("timetable-widget");
+		if (widgets.length === 0) return;
+
+		const now = new Date();
+		const data = clientData;
+		const nowParts = getChinaDateParts(now);
+
+		// 计算当前周
+		const parts = data.startDate.split("-");
+		const startMs =
+			Date.UTC(
+				parseInt(parts[0], 10),
+				parseInt(parts[1], 10) - 1,
+				parseInt(parts[2], 10),
+				0,
+				0,
+				0,
+				0,
+			) - CHINA_TZ_OFFSET_MS;
+		const nowMs = Date.UTC(
+			nowParts.year,
+			nowParts.month,
+			nowParts.dayOfMonth,
+			nowParts.hours,
+			nowParts.minutes,
+			0,
+			0,
+		) - CHINA_TZ_OFFSET_MS;
+		const diffMs = nowMs - startMs;
+		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+		const week = Math.floor(diffDays / 7) + 1;
+
+		// 当前星期几
+		const jsDay = nowParts.day;
+		const day = jsDay === 0 ? 7 : jsDay;
+
+		const dayNames = [
+			"",
+			"周一",
+			"周二",
+			"周三",
+			"周四",
+			"周五",
+			"周六",
+			"周日",
+		];
+		const hours = nowParts.hours;
+		const minutes = nowParts.minutes;
+		const currentTimeStr =
+			hours.toString().padStart(2, "0") +
+			":" +
+			minutes.toString().padStart(2, "0");
+
+		widgets.forEach((widget) => {
+			const statusEl = widget.querySelector("[data-timetable-status]");
+			const todayEl = widget.querySelector("[data-timetable-today]");
+			if (!statusEl) return;
+
+			// 更新周次显示
+			const weekEl = widget.querySelector("[data-timetable-week]");
+			if (weekEl) {
+				if (week < 1) {
+					weekEl.textContent = "学期未开始";
+				} else if (week > data.maxWeek) {
+					weekEl.textContent = "学期已结束";
+				} else {
+					weekEl.textContent = "第" + week + "周 · " + dayNames[day];
+				}
+			}
+
+			if (week < 1 || week > data.maxWeek) {
+				statusEl.innerHTML =
+					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">' +
+					(week < 1 ? "学期还未开始" : "本学期已结束") +
+					"</div></div>";
+				if (todayEl) {
+					todayEl.classList.add("hidden");
+					todayEl.innerHTML = "";
+				}
+				return;
+			}
+
+			// 获取今天的课程
+			const todayCourses = data.schedules
+				.filter((s) => {
+					if (s.day !== day) return false;
+					if (week < s.startWeek || week > s.endWeek) return false;
+					if (s.type === 1 && week % 2 === 0) return false;
+					if (s.type === 2 && week % 2 === 1) return false;
+					return true;
+				})
+				.map((s) => {
+					const course = data.courses.find((c) => c.id === s.id);
+					const startNode = data.timeNodes.find(
+						(n) => n.node === s.startNode,
+					);
+					const endNode = data.timeNodes.find(
+						(n) => n.node === s.startNode + s.step - 1,
+					);
+					return {
+						courseName: course ? course.courseName : "未知课程",
+						color: course ? course.color : "#888",
+						teacher: s.teacher,
+						room: s.room,
+						startTime: startNode ? startNode.startTime : "",
+						endTime: endNode ? endNode.endTime : "",
+						startNode: s.startNode,
+					};
+				})
+				.sort((a, b) => a.startNode - b.startNode);
+
+			// 查找当前和下一节课
+			let currentCourse = null;
+			let nextCourse = null;
+
+			for (const course of todayCourses) {
+				if (
+					currentTimeStr >= course.startTime &&
+					currentTimeStr < course.endTime
+				) {
+					currentCourse = course;
+				} else if (currentTimeStr < course.startTime && !nextCourse) {
+					nextCourse = course;
+				}
+			}
+
+			if (currentCourse) {
+				const nextIdx = todayCourses.indexOf(currentCourse) + 1;
+				if (nextIdx < todayCourses.length) {
+					nextCourse = todayCourses[nextIdx];
+				}
+			}
+
+			let html = "";
+
+			if (currentCourse) {
+				html += '<div class="mb-3">';
+				html +=
+					'<div class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mb-1.5 flex items-center gap-1">';
+				html += '<span class="relative flex h-2 w-2">';
+				html +=
+					'<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>';
+				html +=
+					'<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>';
+				html += "</span>正在上课</div>";
+				html +=
+					'<div class="rounded-lg p-3 border-l-[3px] bg-neutral-50 dark:bg-neutral-800/50" style="border-left-color: ' +
+					currentCourse.color +
+					'">';
+				html +=
+					'<div class="font-bold text-sm text-neutral-900 dark:text-neutral-100">' +
+					currentCourse.courseName +
+					"</div>";
+				html +=
+					'<div class="flex items-center gap-3 mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">';
+				html +=
+					"<span>" +
+					currentCourse.startTime +
+					"-" +
+					currentCourse.endTime +
+					"</span>";
+				if (currentCourse.room)
+					html += "<span>" + currentCourse.room + "</span>";
+				html += "</div>";
+				if (currentCourse.teacher) {
+					html +=
+						'<div class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">' +
+						currentCourse.teacher +
+						"</div>";
+				}
+				html += "</div></div>";
+
+				if (nextCourse) {
+					html +=
+						'<div><div class="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1.5">下一节</div>';
+					html +=
+						'<div class="rounded-lg p-2.5 border-l-[3px] bg-neutral-50/50 dark:bg-neutral-800/30" style="border-left-color: ' +
+						nextCourse.color +
+						'80">';
+					html +=
+						'<div class="text-sm text-neutral-700 dark:text-neutral-300">' +
+						nextCourse.courseName +
+						"</div>";
+					html +=
+						'<div class="flex items-center gap-3 mt-1 text-xs text-neutral-400 dark:text-neutral-500">';
+					html +=
+						"<span>" +
+						nextCourse.startTime +
+						"-" +
+						nextCourse.endTime +
+						"</span>";
+					if (nextCourse.room)
+						html += "<span>" + nextCourse.room + "</span>";
+					html += "</div></div></div>";
+				}
+			} else if (nextCourse) {
+				const firstCourse = todayCourses[0];
+				const label =
+					currentTimeStr < firstCourse.startTime
+						? "即将开始"
+						: "下课时间";
+				html +=
+					'<div><div class="text-xs text-amber-600 dark:text-amber-400 font-medium mb-1.5 flex items-center gap-1">';
+				html += label + "</div>";
+				html +=
+					'<div class="rounded-lg p-3 border-l-[3px] bg-neutral-50 dark:bg-neutral-800/50" style="border-left-color: ' +
+					nextCourse.color +
+					'">';
+				html +=
+					'<div class="font-bold text-sm text-neutral-900 dark:text-neutral-100">' +
+					nextCourse.courseName +
+					"</div>";
+				html +=
+					'<div class="flex items-center gap-3 mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">';
+				html +=
+					"<span>" +
+					nextCourse.startTime +
+					"-" +
+					nextCourse.endTime +
+					"</span>";
+				if (nextCourse.room)
+					html += "<span>" + nextCourse.room + "</span>";
+				html += "</div>";
+				if (nextCourse.teacher) {
+					html +=
+						'<div class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">' +
+						nextCourse.teacher +
+						"</div>";
+				}
+				html += "</div></div>";
+			} else if (todayCourses.length > 0) {
+				html +=
+					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今天课程已结束</div></div>';
+			} else {
+				html +=
+					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今天没有课程</div></div>';
+			}
+
+			statusEl.innerHTML = html;
+
+			if (!todayEl) return;
+			if (todayCourses.length === 0) {
+				todayEl.classList.add("hidden");
+				todayEl.innerHTML = "";
+				return;
+			}
+
+			todayEl.classList.remove("hidden");
+			todayEl.innerHTML =
+				'<div class="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-2">今日课程</div>' +
+				'<div class="flex flex-col gap-1.5">' +
+				todayCourses
+					.map(
+						(course) =>
+							'<div class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-colors">' +
+							'<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ' +
+							course.color +
+							'"></span>' +
+							'<span class="text-sm text-neutral-700 dark:text-neutral-300 truncate flex-1">' +
+							escapeHtml(course.courseName) +
+							"</span>" +
+							'<span class="text-xs text-neutral-400 dark:text-neutral-500 shrink-0">' +
+							escapeHtml(course.startTime) +
+							"</span>" +
+							"</div>",
+					)
+					.join("") +
+				"</div>";
+		});
+	}
+
+	// 首屏立即校准一次，避免 SSR 与客户端存在时区差异时短暂显示错误状态
+	updateTimetableWidget();
+
+	// 每分钟更新一次
+	setInterval(updateTimetableWidget, 60000);
+
+	// 页面切换时更新
+	document.addEventListener("swup:contentReplaced", () => {
+		setTimeout(updateTimetableWidget, 200);
+	});
+</script>

@@ -83,11 +83,11 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：标签组件
 			type: "tags",
 			// 是否启用该组件
-			enable: true,
+			enable: false,
 			// 组件位置
 			position: "sticky",
 			// 是否在文章详情页显示
-			showOnPostPage: true,
+			showOnPostPage: false,
 			// 响应式配置
 			responsive: {
 				// 折叠阈值：当标签数量超过>10个时自动折叠
@@ -124,7 +124,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：日历组件
 			type: "calendar",
 			// 是否启用该组件
-			enable: true,
+			enable: false,
 			// 组件位置
 			position: "sticky",
 			// 是否在文章详情页显示
@@ -153,6 +153,16 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			showOnPostPage: true,
 			// 配置ID：使用第二个广告配置
 			configId: "ad2",
+		},
+		{
+			// 组件类型：课程表组件（右侧栏最下方）
+			type: "timetable",
+			// 是否启用该组件
+			enable: true,
+			// 组件位置
+			position: "sticky",
+			// 是否在文章详情页显示
+			showOnPostPage: true,
 		},
 	],
 
@@ -187,7 +197,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：分类组件
 			type: "categories",
 			// 是否启用该组件
-			enable: true,
+			enable: false,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
 			// 响应式配置
@@ -200,9 +210,9 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：标签组件
 			type: "tags",
 			// 是否启用该组件
-			enable: true,
+			enable: false,
 			// 是否在文章详情页显示
-			showOnPostPage: true,
+			showOnPostPage: false,
 			// 响应式配置
 			responsive: {
 				// 折叠阈值：当标签数量超过20个时自动折叠
@@ -212,6 +222,14 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 		{
 			// 组件类型：站点统计组件
 			type: "stats",
+			// 是否启用该组件
+			enable: true,
+			// 是否在文章详情页显示
+			showOnPostPage: true,
+		},
+		{
+			// 组件类型：课程表组件（右侧栏最下方）
+			type: "timetable",
 			// 是否启用该组件
 			enable: true,
 			// 是否在文章详情页显示
