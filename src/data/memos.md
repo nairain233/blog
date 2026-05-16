@@ -1,4 +1,10 @@
 ---
+- date: 2026-05-15 23:14
+  content: |
+    今天购入了.com域名，结果不知道为什么直接就dns污染了，然后又购入.xyz域名，不过说实话.xyz续费好贵，比com都贵了，我现在先试着备案（）
+
+  tags: [折腾]
+
 - date: 2026-05-10 01:22
   content: |
     Day before yesterday I saw a rabbit, and yesterday a deer, and today, you.  
