@@ -178,13 +178,13 @@ export const siteConfig: SiteConfig = {
 		// Google Analytics ID
 		googleAnalyticsId: "G-VMTTSXZR2Z",
 		// Microsoft Clarity ID
-		microsoftClarityId: "",
+		microsoftClarityId: "ws1sg1spyy",
 		// Umami 统计配置
 		umamiAnalytics: {
 			// Umami Website ID
 			websiteId: "61cf25da-3c0e-4f4a-8451-e615994102fc",
 			// Umami JS地址，支持使用自建
-			scriptUrl: "https://u.nairain.xyz/script.js",
+			scriptUrl: "https://u.teadrink.me/script.js",
 			// 是否追踪出站链接
 			trackOutboundLinks: true,
 			// 是否收集浏览器性能指标
