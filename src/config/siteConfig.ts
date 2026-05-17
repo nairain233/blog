@@ -16,7 +16,7 @@ export const siteConfig: SiteConfig = {
 	site_url: "https://blog.nairain.xyz/",
 
 	// 站点描述
-	description: "我的博客，用来写一些文章和感悟之类的东西。",
+	description: "夜雨的博客，用来写一些文章和感悟之类的生活中的东西。",
 
 	// 站点关键词
 	keywords: [
@@ -144,7 +144,7 @@ export const siteConfig: SiteConfig = {
 	},
 
 	// 分类导航栏开关，在首页和归档页顶部显示分类快捷导航
-	categoryBar: true,
+	categoryBar: false,
 
 	// 文章列表布局配置
 	postListLayout: {
