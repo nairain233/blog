@@ -3,6 +3,7 @@
  * 解析来自 WakeUp 课程表导出的 JSON 数据
  */
 
+import { siteConfig } from "@/config";
 import defaultTimetableRaw from "@/data/timetable/大一下.jsonl?raw";
 
 // 课程表元信息
@@ -102,18 +103,31 @@ export interface ResolvedCourse {
 	credit: number;
 }
 
-const CHINA_TZ_OFFSET_MS = 8 * 60 * 60 * 1000;
+function getTzOffsetMs(date: Date, timeZone?: string): number {
+	if (!timeZone) return -date.getTimezoneOffset() * 60000;
+	try {
+		const tzDate = new Date(date.toLocaleString("en-US", { timeZone }));
+		const localDate = new Date(date.toLocaleString("en-US"));
+		return (
+			tzDate.getTime() - localDate.getTime() + -date.getTimezoneOffset() * 60000
+		);
+	} catch {
+		return -date.getTimezoneOffset() * 60000;
+	}
+}
 
-function getChinaDateParts(date: Date): {
+function getTzDateParts(date: Date): {
 	day: number;
 	hours: number;
 	minutes: number;
 } {
-	const chinaDate = new Date(date.getTime() + CHINA_TZ_OFFSET_MS);
+	const tzDate = new Date(
+		date.getTime() + getTzOffsetMs(date, siteConfig.timezone),
+	);
 	return {
-		day: chinaDate.getUTCDay(),
-		hours: chinaDate.getUTCHours(),
-		minutes: chinaDate.getUTCMinutes(),
+		day: tzDate.getUTCDay(),
+		hours: tzDate.getUTCHours(),
+		minutes: tzDate.getUTCMinutes(),
 	};
 }
 
@@ -169,9 +183,13 @@ export function getCurrentWeek(startDate: string, now: Date): number {
 	const startYear = Number.parseInt(parts[0], 10);
 	const startMonth = Number.parseInt(parts[1], 10) - 1;
 	const startDay = Number.parseInt(parts[2], 10);
-	// 使用固定 UTC+8 计算，避免服务端时区（如 UTC）导致周次偏移
+
+	// 使用时区 offset 计算，避免服务端时区（如 UTC）导致周次偏移
+	const tempDate = new Date(
+		Date.UTC(startYear, startMonth, startDay, 0, 0, 0, 0),
+	);
 	const startMs =
-		Date.UTC(startYear, startMonth, startDay, 0, 0, 0, 0) - CHINA_TZ_OFFSET_MS;
+		tempDate.getTime() - getTzOffsetMs(tempDate, siteConfig.timezone);
 
 	const diffMs = now.getTime() - startMs;
 	const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -183,7 +201,7 @@ export function getCurrentWeek(startDate: string, now: Date): number {
  * 获取当前星期几 (1=周一, 7=周日)
  */
 export function getCurrentDay(now: Date): number {
-	const { day } = getChinaDateParts(now);
+	const { day } = getTzDateParts(now);
 	const jsDay = day; // 0=周日
 	return jsDay === 0 ? 7 : jsDay;
 }
@@ -261,7 +279,7 @@ export function getCurrentCourseStatus(
 ): CurrentCourseStatus {
 	const week = getCurrentWeek(data.config.startDate, now);
 	const day = getCurrentDay(now);
-	const { hours, minutes } = getChinaDateParts(now);
+	const { hours, minutes } = getTzDateParts(now);
 	const currentTimeStr = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
 	// 学期未开始或已结束

@@ -1,9 +1,9 @@
 ---
 import { Icon } from "astro-icon/components";
 import matter from "gray-matter";
-import memosRaw from "@/data/memos.md?raw";
 import WidgetLayout from "@/components/common/WidgetLayout.astro";
 import { siteConfig } from "@/config";
+import memosRaw from "@/data/memos.md?raw";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import {
@@ -57,9 +57,7 @@ const latestPost = posts.reduce((latest, post) => {
 	return post.data.published > latest.data.published ? post : latest;
 }, posts[0]);
 
-const lastPostDate = latestPost
-	? latestPost.data.published
-	: null;
+const lastPostDate = latestPost ? latestPost.data.published : null;
 
 // 解析动态数据获取最新动态日期
 type MemoItem = { date?: string };
@@ -74,9 +72,10 @@ const sortedMemos = frontmatterMemos
 	.sort(
 		(a, b) =>
 			new Date(b.date as string).getTime() -
-			new Date(a.date as string).getTime()
+			new Date(a.date as string).getTime(),
 	);
-const lastMemoDate = sortedMemos.length > 0 ? new Date(sortedMemos[0].date as string) : null;
+const lastMemoDate =
+	sortedMemos.length > 0 ? new Date(sortedMemos[0].date as string) : null;
 
 // 计算最后活动日期（比较最新文章和最新动态）
 let latestActivityDate = lastPostDate;

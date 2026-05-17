@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import { siteConfig } from "@/config";
 import { convertColorHex, parseTimetableData } from "@/utils/timetable-utils";
 
 interface Props {
@@ -44,6 +45,7 @@ const clientData = {
 		type: s.type,
 	})),
 	timeNodes: validTimeNodes,
+	timeZone: siteConfig.timezone,
 };
 ---
 
@@ -84,17 +86,28 @@ const clientData = {
 </WidgetLayout>
 
 <script is:inline define:vars={{ clientData }}>
-	const CHINA_TZ_OFFSET_MS = 8 * 60 * 60 * 1000;
+	function getTzOffsetMs(date, timeZone) {
+		if (!timeZone) return -date.getTimezoneOffset() * 60000;
+		try {
+			const tzDate = new Date(date.toLocaleString("en-US", { timeZone }));
+			const localDate = new Date(date.toLocaleString("en-US"));
+			return (
+				tzDate.getTime() - localDate.getTime() + -date.getTimezoneOffset() * 60000
+			);
+		} catch {
+			return -date.getTimezoneOffset() * 60000;
+		}
+	}
 
-	function getChinaDateParts(date) {
-		const chinaDate = new Date(date.getTime() + CHINA_TZ_OFFSET_MS);
+	function getTzDateParts(date) {
+		const tzDate = new Date(date.getTime() + getTzOffsetMs(date, clientData.timeZone));
 		return {
-			year: chinaDate.getUTCFullYear(),
-			month: chinaDate.getUTCMonth(),
-			dayOfMonth: chinaDate.getUTCDate(),
-			day: chinaDate.getUTCDay(),
-			hours: chinaDate.getUTCHours(),
-			minutes: chinaDate.getUTCMinutes(),
+			year: tzDate.getUTCFullYear(),
+			month: tzDate.getUTCMonth(),
+			dayOfMonth: tzDate.getUTCDate(),
+			day: tzDate.getUTCDay(),
+			hours: tzDate.getUTCHours(),
+			minutes: tzDate.getUTCMinutes(),
 		};
 	}
 
@@ -114,21 +127,22 @@ const clientData = {
 
 		const now = new Date();
 		const data = clientData;
-		const nowParts = getChinaDateParts(now);
+		const nowParts = getTzDateParts(now);
 
 		// 计算当前周
 		const parts = data.startDate.split("-");
-		const startMs =
-			Date.UTC(
-				parseInt(parts[0], 10),
-				parseInt(parts[1], 10) - 1,
-				parseInt(parts[2], 10),
-				0,
-				0,
-				0,
-				0,
-			) - CHINA_TZ_OFFSET_MS;
-		const nowMs = Date.UTC(
+		const tempDate = new Date(Date.UTC(
+			parseInt(parts[0], 10),
+			parseInt(parts[1], 10) - 1,
+			parseInt(parts[2], 10),
+			0,
+			0,
+			0,
+			0,
+		));
+		const startMs = tempDate.getTime() - getTzOffsetMs(tempDate, data.timeZone);
+
+		const tempNowDate = new Date(Date.UTC(
 			nowParts.year,
 			nowParts.month,
 			nowParts.dayOfMonth,
@@ -136,7 +150,9 @@ const clientData = {
 			nowParts.minutes,
 			0,
 			0,
-		) - CHINA_TZ_OFFSET_MS;
+		));
+		const nowMs = tempNowDate.getTime() - getTzOffsetMs(tempNowDate, data.timeZone);
+
 		const diffMs = nowMs - startMs;
 		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 		const week = Math.floor(diffDays / 7) + 1;
