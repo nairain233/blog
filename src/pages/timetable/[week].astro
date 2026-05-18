@@ -257,7 +257,7 @@ function getDayOfWeekText(
 				</span>
 				<span class="flex items-center gap-1 hidden" data-status-idle>
 					<Icon name="material-symbols:circle" class="text-[0.5rem]" />
-					下课时间
+					<span data-idle-text>下课时间</span>
 				</span>
 			</div>
 		</div>
@@ -340,6 +340,27 @@ function getDayOfWeekText(
 			minutes.toString().padStart(2, "0");
 
 		let hasCurrentCourse = false;
+		let hasFutureCourseToday = false;
+
+		const todayCourses = data.schedules.filter((s) => {
+			if (s.day !== day) return false;
+			if (week < s.startWeek || week > s.endWeek) return false;
+			if (s.type === 1 && week % 2 === 0) return false;
+			if (s.type === 2 && week % 2 === 1) return false;
+			return true;
+		});
+
+		todayCourses.forEach((course) => {
+			const timeNode = data.timeNodes.find((n) => n.node === course.startNode);
+			const endTimeNode = data.timeNodes.find((n) => n.node === course.startNode + course.step - 1);
+			if (timeNode && endTimeNode) {
+				if (currentTimeStr >= timeNode.startTime && currentTimeStr < endTimeNode.endTime) {
+					hasCurrentCourse = true;
+				} else if (currentTimeStr < timeNode.startTime) {
+					hasFutureCourseToday = true;
+				}
+			}
+		});
 
 		timetableContainers.forEach((container) => {
 			// 检查是否在当前周
@@ -397,6 +418,13 @@ function getDayOfWeekText(
 		if (inClassEl && idleEl) {
 			inClassEl.classList.toggle("hidden", !hasCurrentCourse);
 			idleEl.classList.toggle("hidden", hasCurrentCourse);
+
+			if (!hasCurrentCourse) {
+				const idleTextEl = idleEl.querySelector("[data-idle-text]");
+				if (idleTextEl) {
+					idleTextEl.textContent = hasFutureCourseToday ? "下课时间" : "今日课毕";
+				}
+			}
 		}
 	}
 

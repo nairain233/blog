@@ -321,11 +321,18 @@ const clientData = {
 					html += "</div></div></div>";
 				}
 			} else if (nextCourse) {
-				const firstCourse = todayCourses[0];
-				const label =
-					currentTimeStr < firstCourse.startTime
-						? "即将开始"
-						: "下课时间";
+				const nextParts = nextCourse.startTime.split(":");
+				let diffH = parseInt(nextParts[0], 10) - hours;
+				let diffM = parseInt(nextParts[1], 10) - minutes;
+				if (diffM < 0) {
+					diffM += 60;
+					diffH -= 1;
+				}
+				let timeLeft = "";
+				if (diffH > 0) timeLeft += diffH + "小时";
+				timeLeft += diffM + "分钟";
+				const label = "距离下节课 " + timeLeft;
+				
 				html +=
 					'<div><div class="text-xs text-amber-600 dark:text-amber-400 font-medium mb-1.5 flex items-center gap-1">';
 				html += label + "</div>";
@@ -357,10 +364,10 @@ const clientData = {
 				html += "</div></div>";
 			} else if (todayCourses.length > 0) {
 				html +=
-					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今天课程已结束</div></div>';
+					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今日课毕</div></div>';
 			} else {
 				html +=
-					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今天没有课程</div></div>';
+					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今日无课</div></div>';
 			}
 
 			statusEl.innerHTML = html;
