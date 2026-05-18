@@ -1,5 +1,5 @@
 ---
-title: 利用VPNHotspot对抗无法共享流量的局面
+title: 利用VPNHotspot对抗无法共享无线流量的局面
 published: 2026-05-07
 description: 在这个对抗的途中，我都学习了什么
 image: ./images/VPNHotspot-cover.png
@@ -11,7 +11,7 @@ draft: false
 lang: ""
 ---
 ###  使用场景
-某些通信厂商限制了热点，这时候我们就可以通过这种方式来让绕过
+某些通信厂商限制了热点，这时候我们就可以通过这种方式来绕过
 ###  如何配置呢
 #### 开始准备
 **必须**   
@@ -22,9 +22,7 @@ lang: ""
 #### 开始配置
 1.  配置vpn    
  gemini推荐我vpn用nekobox（我之前用的是v2rayNG来着，但是我没感觉到明显的区别），   
- （nekobox配置如下，没有就是我又鸽了，:spoiler[ ~~nekobox里面甚至可以配置上vless+realitly，实现手机连上共享网络直接科学上网，我写的是一个根本不通的配置~~]！ 但是我没整） 
- 没问题，用表格呈现确实更加直观，方便你日后随时查阅核对。
-以下是为你整理的 **HyperOS 免 Root 校园网热点防封终极配置表**：
+ （nekobox配置如下，没有就是我又鸽了，:spoiler[ ~~nekobox里面甚至可以配置上vless+realitly，实现手机连上共享网络直接科学上网， 但是我没整，我写的是一个根本不通的配置~~]！） 
 
  表 1：NekoBox 核心参数配置 (设置 菜单)
 
