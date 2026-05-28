@@ -54,11 +54,13 @@ export const sponsorConfig: SponsorConfig = {
 		// 示例：已实名赞助者
 		{
 			name: "天依",
+			avatar: "",
 			amount: "¥52",
 			date: "2025-07-12",
 		},
 		{
 			name: "Hanstune Miku",
+			avatar: "",
 			amount: "¥39",
 			date: "2025-08-31",
 		},
@@ -66,6 +68,7 @@ export const sponsorConfig: SponsorConfig = {
 		// 示例：匿名赞助者
 		{
 			name: "匿名用户",
+			avatar: "",
 			amount: "观看量*n",
 			date: "2025-08-31",
 		},
