@@ -207,34 +207,38 @@ const clientData = {
 				return;
 			}
 
+			function getCourses(targetDay, targetWeek) {
+				return data.schedules
+					.filter((s) => {
+						if (s.day !== targetDay) return false;
+						if (targetWeek < s.startWeek || targetWeek > s.endWeek) return false;
+						if (s.type === 1 && targetWeek % 2 === 0) return false;
+						if (s.type === 2 && targetWeek % 2 === 1) return false;
+						return true;
+					})
+					.map((s) => {
+						const course = data.courses.find((c) => c.id === s.id);
+						const startNode = data.timeNodes.find(
+							(n) => n.node === s.startNode,
+						);
+						const endNode = data.timeNodes.find(
+							(n) => n.node === s.startNode + s.step - 1,
+						);
+						return {
+							courseName: course ? course.courseName : "未知课程",
+							color: course ? course.color : "#888",
+							teacher: s.teacher,
+							room: s.room,
+							startTime: startNode ? startNode.startTime : "",
+							endTime: endNode ? endNode.endTime : "",
+							startNode: s.startNode,
+						};
+					})
+					.sort((a, b) => a.startNode - b.startNode);
+			}
+
 			// 获取今天的课程
-			const todayCourses = data.schedules
-				.filter((s) => {
-					if (s.day !== day) return false;
-					if (week < s.startWeek || week > s.endWeek) return false;
-					if (s.type === 1 && week % 2 === 0) return false;
-					if (s.type === 2 && week % 2 === 1) return false;
-					return true;
-				})
-				.map((s) => {
-					const course = data.courses.find((c) => c.id === s.id);
-					const startNode = data.timeNodes.find(
-						(n) => n.node === s.startNode,
-					);
-					const endNode = data.timeNodes.find(
-						(n) => n.node === s.startNode + s.step - 1,
-					);
-					return {
-						courseName: course ? course.courseName : "未知课程",
-						color: course ? course.color : "#888",
-						teacher: s.teacher,
-						room: s.room,
-						startTime: startNode ? startNode.startTime : "",
-						endTime: endNode ? endNode.endTime : "",
-						startNode: s.startNode,
-					};
-				})
-				.sort((a, b) => a.startNode - b.startNode);
+			const todayCourses = getCourses(day, week);
 
 			// 查找当前和下一节课
 			let currentCourse = null;
@@ -255,6 +259,24 @@ const clientData = {
 				const nextIdx = todayCourses.indexOf(currentCourse) + 1;
 				if (nextIdx < todayCourses.length) {
 					nextCourse = todayCourses[nextIdx];
+				}
+			}
+
+			let displayCourses = todayCourses;
+			let displayTitle = "今日课程";
+			let showTomorrow = false;
+			let tomorrowFirstCourse = null;
+
+			if (!currentCourse && !nextCourse) {
+				const tomorrowDay = day === 7 ? 1 : day + 1;
+				const tomorrowWeek = day === 7 ? week + 1 : week;
+				const tomorrowCourses = getCourses(tomorrowDay, tomorrowWeek);
+				
+				if (tomorrowCourses.length > 0) {
+					showTomorrow = true;
+					displayCourses = tomorrowCourses;
+					displayTitle = "明日课程";
+					tomorrowFirstCourse = tomorrowCourses[0];
 				}
 			}
 
@@ -362,6 +384,35 @@ const clientData = {
 						"</div>";
 				}
 				html += "</div></div>";
+			} else if (showTomorrow) {
+				html +=
+					'<div><div class="text-xs text-amber-600 dark:text-amber-400 font-medium mb-1.5 flex items-center gap-1">明日首节课</div>';
+				html +=
+					'<div class="rounded-lg p-3 border-l-[3px] bg-neutral-50 dark:bg-neutral-800/50" style="border-left-color: ' +
+					tomorrowFirstCourse.color +
+					'">';
+				html +=
+					'<div class="font-bold text-sm text-neutral-900 dark:text-neutral-100">' +
+					tomorrowFirstCourse.courseName +
+					"</div>";
+				html +=
+					'<div class="flex items-center gap-3 mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">';
+				html +=
+					"<span>" +
+					tomorrowFirstCourse.startTime +
+					"-" +
+					tomorrowFirstCourse.endTime +
+					"</span>";
+				if (tomorrowFirstCourse.room)
+					html += "<span>" + tomorrowFirstCourse.room + "</span>";
+				html += "</div>";
+				if (tomorrowFirstCourse.teacher) {
+					html +=
+						'<div class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">' +
+						tomorrowFirstCourse.teacher +
+						"</div>";
+				}
+				html += "</div></div>";
 			} else if (todayCourses.length > 0) {
 				html +=
 					'<div class="text-center py-3"><div class="text-sm text-neutral-500 dark:text-neutral-400">今日课毕</div></div>';
@@ -373,7 +424,7 @@ const clientData = {
 			statusEl.innerHTML = html;
 
 			if (!todayEl) return;
-			if (todayCourses.length === 0) {
+			if (displayCourses.length === 0) {
 				todayEl.classList.add("hidden");
 				todayEl.innerHTML = "";
 				return;
@@ -381,9 +432,9 @@ const clientData = {
 
 			todayEl.classList.remove("hidden");
 			todayEl.innerHTML =
-				'<div class="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-2">今日课程</div>' +
+				'<div class="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-2">' + displayTitle + '</div>' +
 				'<div class="flex flex-col gap-1.5">' +
-				todayCourses
+				displayCourses
 					.map(
 						(course) =>
 							'<div class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-colors">' +
