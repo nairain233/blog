@@ -14,7 +14,8 @@
       "!**/dist/**/*",
       "!**/node_modules/**/*",
       "!**/src/constants/icons.ts",
-	    "!**/src/content/.obsidian/**"
+	    "!**/src/content/.obsidian/**",
+      "!**/src/constants/lqips.json"
     ]
   },
   "formatter": {
