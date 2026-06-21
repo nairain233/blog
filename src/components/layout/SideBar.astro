@@ -7,6 +7,7 @@ import Categories from "@/components/widget/Categories.astro";
 import Music from "@/components/widget/Music.astro";
 import Profile from "@/components/widget/Profile.astro";
 import SidebarTOC from "@/components/widget/SidebarTOC.astro";
+import SiteInfo from "@/components/widget/SiteInfo.astro";
 import SiteStats from "@/components/widget/SiteStats.astro";
 import Tags from "@/components/widget/Tags.astro";
 import Timetable from "@/components/widget/Timetable.astro";
@@ -14,7 +15,6 @@ import { sidebarLayoutConfig } from "@/config";
 import type {
 	MobileBottomComponentConfig,
 	WidgetComponentConfig,
-	WidgetComponentType,
 } from "@/types/config";
 
 interface Props {
@@ -50,6 +50,7 @@ const componentMap = {
 	stats: SiteStats,
 	calendar: Calendar,
 	music: Music,
+	siteInfo: SiteInfo,
 	timetable: Timetable,
 } satisfies Record<WidgetComponentType, typeof Profile>;
 
@@ -132,6 +133,7 @@ const getComponentProps = (
 	const baseProps: Record<string, unknown> = {
 		class: "onload-animation",
 		style: `animation-delay: ${getAnimationDelay(index)}`,
+		widgetConfig: config,
 	};
 
 	// 添加 showOnPostPage 和 showOnNonPostPage 标记class（仅WidgetComponentConfig有这些属性）
@@ -152,15 +154,6 @@ const getComponentProps = (
 	// 特殊处理 SidebarTOC 组件
 	if (config.type === "sidebarToc") {
 		return { ...baseProps, headings: Astro.props.headings || [] };
-	}
-
-	// 特殊处理 Advertisement 组件
-	if (
-		config.type === "advertisement" &&
-		"configId" in config &&
-		config.configId
-	) {
-		return { ...baseProps, configId: config.configId };
 	}
 
 	return baseProps;
