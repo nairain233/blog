@@ -62,10 +62,13 @@ const getActivityDate = (post: (typeof posts)[number]): Date => {
 	return published;
 };
 
-const lastPostDate = posts.reduce((maxDate, post) => {
-	const activityDate = getActivityDate(post);
-	return !maxDate || activityDate > maxDate ? activityDate : maxDate;
-}, null as Date | null);
+const lastPostDate = posts.reduce(
+	(maxDate, post) => {
+		const activityDate = getActivityDate(post);
+		return !maxDate || activityDate > maxDate ? activityDate : maxDate;
+	},
+	null as Date | null,
+);
 
 // 解析动态数据获取最新动态日期
 type MemoItem = { date?: string };

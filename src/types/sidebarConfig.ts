@@ -9,7 +9,9 @@ export type WidgetComponentType =
 	| "stats"
 	| "calendar"
 	| "music"
-	| "siteInfo";
+	| "siteInfo"
+	| "timetable"
+	| "memos";
 
 export type WidgetComponentConfig = {
 	type: WidgetComponentType; // 组件类型

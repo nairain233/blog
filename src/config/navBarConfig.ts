@@ -39,6 +39,9 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 	// 留言板
 	links.push(LinkPresets.Guestbook);
 
+	// 动态
+	links.push(LinkPresets.Memos);
+
 	// 我的及其子菜单
 	links.push({
 		name: "我的",
@@ -50,6 +53,9 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 
 			// 番组计划
 			LinkPresets.Bangumi,
+
+			// 课程表
+			LinkPresets.Timetable,
 		],
 	});
 
@@ -64,12 +70,12 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 
 			// 关于页面
 			LinkPresets.About,
-			{
-				name: "网站状态",
-				url: "https://status.nairain.xyz/",
-				external: true,
-				icon: "material-symbols:ecg-heart",
-			},
+			// {
+			// 	name: "网站状态",
+			// 	url: "https://status.nairain.xyz/",
+			// 	external: true,
+			// 	icon: "material-symbols:ecg-heart",
+			// },
 		],
 	});
 	links.push({
@@ -170,6 +176,18 @@ export const LinkPresets: Record<string, NavBarLink> = {
 		url: "/gallery/",
 		icon: "material-symbols:photo-library",
 		pageKey: "gallery",
+	},
+	Memos: {
+		name: "动态",
+		url: "/memos/",
+		icon: "material-symbols:speaker-notes",
+		pageKey: "memos",
+	},
+	Timetable: {
+		name: "课程表",
+		url: "/timetable/",
+		icon: "material-symbols:calendar-month",
+		pageKey: "timetable",
 	},
 };
 
