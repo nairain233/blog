@@ -191,7 +191,7 @@ export const LinkPresets: Record<string, NavBarLink> = {
 		url: "/timetable/",
 		icon: "material-symbols:calendar-month",
 		pageKey: "timetable",
-		},
+	},
 	Anime: {
 		name: "追番",
 		url: "/anime/",
