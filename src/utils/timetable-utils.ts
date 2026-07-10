@@ -4,7 +4,7 @@
  */
 
 import { siteConfig } from "@/config";
-import defaultTimetableRaw from "@/data/timetable/大一下.jsonl?raw";
+import defaultTimetableRaw from "@/data/timetable/大二上.jsonl?raw";
 
 // 课程表元信息
 export interface TimetableMeta {
@@ -157,10 +157,10 @@ export function convertColorHex(color: string): string {
  * 文件格式：每行一个 JSON 对象/数组
  */
 export function parseTimetableData(
-	filePath = "src/data/timetable/大一下.jsonl",
+	filePath = "src/data/timetable/大二上.jsonl",
 ): TimetableData {
 	const raw = defaultTimetableRaw;
-	if (filePath !== "src/data/timetable/大一下.jsonl") {
+	if (filePath !== "src/data/timetable/大二上.jsonl") {
 		throw new Error(`Unsupported timetable file: ${filePath}`);
 	}
 	const lines = raw.split("\n").filter((l) => l.trim());
