@@ -1,4 +1,4 @@
-name: 发布 Memo
+name: Post Memo
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
           node <<'NODE'
           const fs = require("node:fs");
 
-          const filePath = "src/data/memos.md";
+          const filePath = "src/data/memos.json";
           const decodeMultiline = (value) => {
             return (value || "")
               .replace(/\r\n/g, "\n")
@@ -58,39 +58,26 @@ jobs:
             throw new Error("输入项 content 为空。");
           }
 
-          const escapeTag = (tag) => {
-            const t = tag.trim();
-            return /[\s,:\[\]{}"'\\]/.test(t) ? JSON.stringify(t) : t;
-          };
-
           const tags = memoTagsRaw
             .split(/[\n,]/)
             .map((tag) => tag.trim())
             .filter(Boolean);
 
-          const contentBlock = memoContentRaw
-            .split("\n")
-            .map((line) => `    ${line}`)
-            .join("\n");
-
-          const tagsInline = `[${tags.map(escapeTag).join(", ")}]`;
-
-          const newItem = `- date: ${memoDate}\n  content: |\n${contentBlock}\n\n  tags: ${tagsInline}\n\n`;
+          const newItem = {
+            date: memoDate,
+            content: memoContentRaw,
+            tags,
+          };
 
           const raw = fs.readFileSync(filePath, "utf8");
-          const fmMatch = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
-          if (!fmMatch) {
-            throw new Error(`在 ${filePath} 中未找到 Frontmatter`);
+          const memos = JSON.parse(raw);
+          if (!Array.isArray(memos)) {
+            throw new Error(`在 ${filePath} 中未找到 JSON 数组`);
           }
 
-          const existingFrontmatter = fmMatch[1].trim();
-          const rest = raw.slice(fmMatch[0].length);
-          const mergedFrontmatter = existingFrontmatter
-            ? `${newItem}${existingFrontmatter}\n`
-            : `${newItem}`;
+          memos.unshift(newItem);
 
-          const updated = `---\n${mergedFrontmatter}---\n${rest}`;
-          fs.writeFileSync(filePath, updated, "utf8");
+          fs.writeFileSync(filePath, `${JSON.stringify(memos, null, "\t")}\n`, "utf8");
           NODE
 
       - name: 提交并推送变更
@@ -100,7 +87,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add src/data/memos.md
+          git add src/data/memos.json
 
           if git diff --staged --quiet; then
             echo "没有可提交的变更。"

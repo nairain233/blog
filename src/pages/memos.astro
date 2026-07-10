@@ -1,9 +1,8 @@
 ---
 import { Icon } from "astro-icon/components";
-import matter from "gray-matter";
 import { marked } from "marked";
 import { siteConfig } from "@/config";
-import memosRaw from "@/data/memos.md?raw";
+import memosData from "@/data/memos.json";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 
 // 检查动态页面是否启用
@@ -17,12 +16,7 @@ type MemoItem = {
 	tags?: string[];
 };
 
-const { data } = matter(memosRaw);
-const frontmatterMemos = Array.isArray(data)
-	? (data as MemoItem[])
-	: Array.isArray((data as { memos?: unknown }).memos)
-		? ((data as { memos: MemoItem[] }).memos ?? [])
-		: [];
+const frontmatterMemos = memosData as MemoItem[];
 
 const memos = frontmatterMemos
 	.filter((item) => item?.date && item?.content)
