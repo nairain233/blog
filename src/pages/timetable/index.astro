@@ -9,7 +9,8 @@ import {
 } from "@/utils/timetable-utils";
 
 const data = parseTimetableData();
-let currentWeek = getCurrentWeek(data.config.startDate, new Date());
+const rawCurrentWeek = getCurrentWeek(data.config.startDate, new Date());
+const currentWeek = Math.min(Math.max(rawCurrentWeek, 1), data.config.maxWeek);
 
 const prevWeek = Math.max(1, currentWeek - 1);
 const nextWeek = Math.min(data.config.maxWeek, currentWeek + 1);
