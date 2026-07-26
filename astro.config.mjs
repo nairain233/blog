@@ -218,6 +218,9 @@ export default defineConfig({
 				if (pathname === "/anime/" && !siteConfig.pages.anime) {
 					return false;
 				}
+				if (pathname === "/memos/" && !siteConfig.pages.memos) {
+					return false;
+				}
 
 				return true;
 			},
