@@ -1,0 +1,108 @@
+name: 添加友链
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "站点名称"
+        required: true
+        type: string
+      imgurl:
+        description: "头像图片地址"
+        required: true
+        type: string
+      desc:
+        description: "站点描述"
+        required: true
+        type: string
+      siteurl:
+        description: "站点地址"
+        required: true
+        type: string
+      tags:
+        description: "标签，使用英文逗号分隔"
+        required: false
+        default: "Blog"
+        type: string
+      weight:
+        description: "排序权重，数字越大越靠前"
+        required: false
+        default: "8"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  add-friend-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: 添加友链
+        env:
+          FRIEND_TITLE: ${{ inputs.title }}
+          FRIEND_IMGURL: ${{ inputs.imgurl }}
+          FRIEND_DESC: ${{ inputs.desc }}
+          FRIEND_SITEURL: ${{ inputs.siteurl }}
+          FRIEND_TAGS: ${{ inputs.tags }}
+          FRIEND_WEIGHT: ${{ inputs.weight }}
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const filePath = "src/config/friendsConfig.ts";
+          const requiredFields = [
+            "FRIEND_TITLE",
+            "FRIEND_IMGURL",
+            "FRIEND_DESC",
+            "FRIEND_SITEURL",
+          ];
+
+          for (const field of requiredFields) {
+            if (!process.env[field]?.trim()) {
+              throw new Error(`输入项 ${field} 为空。`);
+            }
+          }
+
+          const weight = Number(process.env.FRIEND_WEIGHT || "9");
+          if (!Number.isInteger(weight)) {
+            throw new Error("weight 必须是整数。");
+          }
+
+          const quote = (value) => JSON.stringify(value.trim());
+          const tags = (process.env.FRIEND_TAGS || "")
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean);
+          const newFriend = `\t{\n\t\ttitle: ${quote(process.env.FRIEND_TITLE)},\n\t\timgurl: ${quote(process.env.FRIEND_IMGURL)},\n\t\tdesc: ${quote(process.env.FRIEND_DESC)},\n\t\tsiteurl: ${quote(process.env.FRIEND_SITEURL)},\n\t\ttags: ${JSON.stringify(tags)},\n\t\tweight: ${weight},\n\t\tenabled: true,\n\t},\n`;
+
+          const source = fs.readFileSync(filePath, "utf8");
+          const marker = "\n];\n\n// 获取启用的友链";
+          const markerIndex = source.indexOf(marker);
+          if (markerIndex === -1) {
+            throw new Error(`未找到 ${filePath} 中的 friendsConfig 结束位置。`);
+          }
+
+          const updated = `${source.slice(0, markerIndex)}\n${newFriend}${source.slice(markerIndex)}`;
+          fs.writeFileSync(filePath, updated, "utf8");
+          NODE
+
+      - name: 提交并推送变更
+        env:
+          FRIEND_TITLE: ${{ inputs.title }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/config/friendsConfig.ts
+
+          if git diff --staged --quiet; then
+            echo "没有可提交的变更。"
+            exit 0
+          fi
+
+          git commit -m "新增${FRIEND_TITLE}友链"
+          git push
