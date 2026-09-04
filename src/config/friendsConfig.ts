@@ -68,6 +68,16 @@ export const friendsConfig: FriendLink[] = [
 		weight: 8,
 		enabled: false,
 	},
+	{
+		title: "忘川河畔",
+		imgurl: "https://been.ee/link/flower.jpg",
+		desc: "木已成舟，渡我者何人？",
+		siteurl: "https://been.ee",
+		tags: ["Blog"],
+		weight: 8,
+		enabled: true,
+	},
+
 ];
 
 // 获取启用的友链并进行排序
