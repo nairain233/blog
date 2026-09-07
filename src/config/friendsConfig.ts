@@ -66,7 +66,7 @@ export const friendsConfig: FriendLink[] = [
 		siteurl: "https://docs-firefly.cuteleaf.cn",
 		tags: ["Docs"],
 		weight: 8,
-		enabled: false,
+		enabled: true,
 	},
 ];
 

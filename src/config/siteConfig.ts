@@ -12,7 +12,7 @@ export const siteConfig: SiteConfig = {
 	subtitle: "华风夏韵",
 
 	// 站点 URL
-	site_url: "https://blog.nairain.xyz/",
+	site_url: "https://blog.nairain.love/",
 
 	// 站点描述
 	description: "夜雨的博客，用来写一些文章和感悟之类的生活中的东西。",

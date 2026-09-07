@@ -73,12 +73,12 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 
 			// 关于页面
 			LinkPresets.About,
-			// {
-			// 	name: "网站状态",
-			// 	url: "https://status.nairain.xyz/",
-			// 	external: true,
-			// 	icon: "material-symbols:ecg-heart",
-			// },
+			{
+				name: "VPS状态",
+				url: "https://status.nairain.love/",
+				external: true,
+				icon: "material-symbols:ecg-heart",
+			},
 		],
 	});
 	links.push({
