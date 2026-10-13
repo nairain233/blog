@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import TimetableGrid from "@/components/pages/TimetableGrid.astro";
 import {
 	convertColorHex,
 	getCoursesForWeek,
@@ -35,15 +36,6 @@ const nextWeek = Math.min(data.config.maxWeek, currentWeek + 1);
 
 // 获取该周所有课程
 const weekCourses = getCoursesForWeek(data, currentWeek);
-
-const dayNames = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-const timeGroups = [
-	{ label: "第1节", startNode: 1, endNode: 2 },
-	{ label: "第2节", startNode: 3, endNode: 4 },
-	{ label: "第3节", startNode: 5, endNode: 6 },
-	{ label: "第4节", startNode: 7, endNode: 8 },
-	{ label: "第5节", startNode: 9, endNode: 11 },
-];
 
 const dayCount = data.config.showSun ? 7 : data.config.showSat ? 6 : 5;
 
@@ -165,85 +157,17 @@ function getDayOfWeekText(
 		</div>
 
 		{/* 课程表网格 */}
-		<div class="px-6">
-			<div class="overflow-x-auto" data-timetable-full={JSON.stringify(clientData)}>
-				<div class="min-w-[800px]">
-				{/* 表头 - 星期 */}
-				<div class="grid grid-cols-[3rem_1fr] gap-2 mb-1">
-					<div />
-					<div class="grid grid-cols-7 gap-1">
-						{dayNames.slice(1, dayCount + 1).map((day, idx) => (
-							<div class="text-center py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
-								<div class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-									{day}
-								</div>
-								<div class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
-									<span class="day-of-week-text" data-day={idx + 1}>{getDayOfWeekText(idx + 1, currentWeek, data.config.startDate)}</span>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-
-				{/* 时间段和课程 */}
-				<div class="grid grid-cols-[3rem_1fr] gap-2">
-					{/* 时间列 */}
-					<div class="grid grid-rows-5 gap-1">
-						{timeGroups.map((group) => {
-							const startTime = validTimeNodes.find((n) => n.node === group.startNode)?.startTime;
-							const endTime = validTimeNodes.find((n) => n.node === group.endNode)?.endTime;
-							return (
-								<div class="text-center py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex flex-col justify-center">
-									<div class="text-sm font-bold text-neutral-700 dark:text-neutral-300">
-										{group.label}
-									</div>
-									<div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-										{startTime}
-									</div>
-									<div class="text-xs text-neutral-400 dark:text-neutral-500">
-										{endTime}
-									</div>
-								</div>
-							);
-						})}
-					</div>
-
-					{/* 课程网格 */}
-					<div class="grid grid-cols-7 grid-rows-5 gap-1">
-						{weekCourses.flat().map((course) => {
-							const groupIndex = timeGroups.findIndex((g) => g.startNode === course.startNode);
-							if (groupIndex === -1) return null;
-
-							return (
-								<div
-									class="rounded-lg overflow-hidden h-full"
-									style={`grid-column: ${course.day}; grid-row: ${groupIndex + 1};`}
-								>
-									<div
-										class="h-full p-2 transition-transform hover:scale-[1.02]"
-										style={`background-color: ${course.color}20; border-left: 3px solid ${course.color};`}
-									>
-										<div class="font-medium text-sm text-neutral-800 dark:text-neutral-200 mb-1">
-											{course.courseName}
-										</div>
-										{course.room && (
-											<div class="text-xs text-neutral-600 dark:text-neutral-400 mb-0.5">
-												@{course.room}
-											</div>
-										)}
-										{course.teacher && (
-											<div class="text-xs text-neutral-500 dark:text-neutral-500">
-												{course.teacher}
-											</div>
-										)}
-									</div>
-								</div>
-							);
-						})}
-					</div>
-				</div>
+		<div class="px-2 sm:px-6">
+			<div class="w-full min-w-0" data-timetable-full={JSON.stringify(clientData)}>
+				<TimetableGrid
+					courses={weekCourses.flat()}
+					timeNodes={validTimeNodes}
+					dayCount={dayCount}
+					dayTexts={Array.from({ length: dayCount }, (_, index) =>
+						getDayOfWeekText(index + 1, currentWeek, data.config.startDate),
+					)}
+				/>
 			</div>
-		</div>
 		</div>
 
 		{/* 当前时间指示器 */}
@@ -441,63 +365,4 @@ function getDayOfWeekText(
 	// 初始化
 	updateDayOfWeekText();
 	setTimeout(updateTimetableHighlight, 500);
-
-	// 课程表拖动
-	const slider = document.querySelector("[data-timetable-full]");
-	let isDown = false;
-	let startX;
-	let scrollLeft;
-
-	if (slider) {
-		slider.addEventListener("mousedown", (e) => {
-			isDown = true;
-			slider.classList.add("active");
-			startX = e.pageX - slider.offsetLeft;
-			scrollLeft = slider.scrollLeft;
-		});
-		slider.addEventListener("mouseleave", () => {
-			isDown = false;
-			slider.classList.remove("active");
-		});
-		slider.addEventListener("mouseup", () => {
-			isDown = false;
-			slider.classList.remove("active");
-		});
-		slider.addEventListener("mousemove", (e) => {
-			if (!isDown) return;
-			e.preventDefault();
-			const x = e.pageX - slider.offsetLeft;
-			const walk = (x - startX) * 2; //scroll-fast
-			slider.scrollLeft = scrollLeft - walk;
-		});
-	}
 </script>
-
-<style>
-	.timetable-highlight {
-		animation: pulse-highlight 2s infinite;
-	}
-
-	[data-timetable-full].active {
-		cursor: grabbing;
-		cursor: -webkit-grabbing;
-	}
-
-	@keyframes pulse-highlight {
-		0%, 100% {
-			transform: scale(1);
-		}
-		50% {
-			transform: scale(1.02);
-		}
-	}
-
-	[data-timetable-full]::-webkit-scrollbar {
-		display: none;
-	}
-
-	[data-timetable-full] {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-	}
-</style>

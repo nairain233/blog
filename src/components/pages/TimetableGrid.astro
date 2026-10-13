@@ -1,0 +1,134 @@
+---
+import type { ResolvedCourse, TimeNode } from "@/utils/timetable-utils";
+
+interface Props {
+	courses: ResolvedCourse[];
+	timeNodes: TimeNode[];
+	dayCount: number;
+	dayTexts?: string[];
+}
+
+const { courses, timeNodes, dayCount, dayTexts = [] } = Astro.props;
+const dayNames = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+const timeGroups = [
+	{ label: "第1节", startNode: 1, endNode: 2 },
+	{ label: "第2节", startNode: 3, endNode: 4 },
+	{ label: "第3节", startNode: 5, endNode: 6 },
+	{ label: "第4节", startNode: 7, endNode: 8 },
+	{ label: "第5节", startNode: 9, endNode: 11 },
+];
+---
+
+<div class="timetable-grid" style={`--day-count: ${dayCount};`}>
+	<div />
+	{dayNames.slice(0, dayCount).map((day, index) => (
+		<div class="timetable-heading text-center py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+			<div class="font-medium text-neutral-700 dark:text-neutral-300">{day}</div>
+			<div class="text-neutral-400 dark:text-neutral-500 mt-0.5">
+				<span class="day-of-week-text" data-day={index + 1}>{dayTexts[index]}</span>
+			</div>
+		</div>
+	))}
+	{timeGroups.map((group, index) => (
+		<div
+			class="timetable-time text-center py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex flex-col justify-center"
+			style={`grid-column: 1; grid-row: ${index + 2};`}
+		>
+			<div class="font-bold text-neutral-700 dark:text-neutral-300">{group.label}</div>
+			<div class="text-neutral-500 dark:text-neutral-400 mt-1">
+				{timeNodes.find((node) => node.node === group.startNode)?.startTime}
+			</div>
+			<div class="text-neutral-400 dark:text-neutral-500">
+				{timeNodes.find((node) => node.node === group.endNode)?.endTime}
+			</div>
+		</div>
+	))}
+	{courses.map((course) => {
+		const groupIndex = timeGroups.findIndex((group) => group.startNode === course.startNode);
+		if (groupIndex === -1 || course.day > dayCount) return null;
+		return (
+			<div
+				class="timetable-course rounded-lg"
+				style={`grid-column: ${course.day + 1}; grid-row: ${groupIndex + 2};`}
+			>
+				<div
+					class="timetable-course-content h-full rounded-lg"
+					style={`background-color: ${course.color}20; border-left: 3px solid ${course.color};`}
+				>
+					<div class="timetable-course-name font-medium text-neutral-800 dark:text-neutral-200 mb-1">
+						{course.courseName}
+					</div>
+					{course.room && (
+						<div class="text-neutral-600 dark:text-neutral-400 mb-0.5">@{course.room}</div>
+					)}
+					{course.teacher && (
+						<div class="text-neutral-500 dark:text-neutral-500">{course.teacher}</div>
+					)}
+				</div>
+			</div>
+		);
+	})}
+</div>
+
+<style>
+	.timetable-grid {
+		display: grid;
+		width: 100%;
+		min-width: 0;
+		grid-template-columns: 3rem repeat(var(--day-count), minmax(0, 1fr));
+		grid-template-rows: auto repeat(5, minmax(6rem, auto));
+		gap: 0.25rem;
+	}
+
+	.timetable-grid > div {
+		min-width: 0;
+	}
+
+	.timetable-heading,
+	.timetable-time,
+	.timetable-course-content {
+		font-size: 0.75rem;
+	}
+
+	.timetable-course-content {
+		padding: 0.5rem;
+		overflow-wrap: anywhere;
+	}
+
+	.timetable-course-name {
+		font-size: 0.875rem;
+	}
+
+	.timetable-highlight {
+		animation: pulse-highlight 2s infinite;
+	}
+
+	@keyframes pulse-highlight {
+		0%, 100% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.02);
+		}
+	}
+
+	@media (max-width: 639px) {
+		.timetable-grid {
+			grid-template-columns: 2.5rem repeat(var(--day-count), minmax(0, 1fr));
+		}
+
+		.timetable-heading,
+		.timetable-time,
+		.timetable-course-content {
+			font-size: 0.625rem;
+		}
+
+		.timetable-course-content {
+			padding: 0.25rem;
+		}
+
+		.timetable-course-name {
+			font-size: 0.75rem;
+		}
+	}
+</style>
